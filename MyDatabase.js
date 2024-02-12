@@ -4,39 +4,35 @@
  * also create lines which will be = records
  * and perform all the CRUD operations on it
  */
-const fs = require('fs')
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 /**This is function to create a database
  * @param {String} Database_Name the name of the database
  * @throws {Error} if there is problem while creating database
  */
-function createDB(Database_Name){
-
-    fs.mkdir(Database_Name,(err) => {
-        if(err){
-            console.error("There is some error while creating database",err);
-        }
-        else{
-            console.log("Database created successfully");
-        }
-    })
+function createDB(Database_Name) {
+  fs.mkdir(Database_Name, (err) => {
+    if (err) {
+      console.error("There is some error while creating database", err);
+    } else {
+      console.log("Database created successfully");
+    }
+  });
 }
 
 /**This is a function to read a database
  * @param {String} Database the database that you want to read
  * @throws {Error} if there is some issue while reading the file
  */
-function readDatabase(Database){
-
-  fs.readdir(Database,(err,files) => {
-    if(err){
-      console.error("There was some error while reading the database")
+function readDatabase(Database) {
+  fs.readdir(Database, (err, files) => {
+    if (err) {
+      console.error("There was some error while reading the database");
+    } else {
+      console.log("Database read successfully", files);
     }
-    else{
-      console.log("Database read successfully",files);
-    }
-  })
+  });
 }
 
 /**This is a function to update a database
@@ -45,12 +41,16 @@ function readDatabase(Database){
  * @throws {Error} when there is some error while updating the database
  */
 function updateDB(Database, newName) {
-
   fs.rename(Database, newName, (err) => {
     if (err) {
-      console.error(`Error renaming folder '${DBstring}' to '${newNameString}':`, err);
+      console.error(
+        `Error renaming folder '${DBstring}' to '${newNameString}':`,
+        err
+      );
     } else {
-      console.log(`Folder '${DBstring}' renamed to '${newNameString}' successfully!`);
+      console.log(
+        `Folder '${DBstring}' renamed to '${newNameString}' successfully!`
+      );
     }
   });
 }
@@ -60,7 +60,6 @@ function updateDB(Database, newName) {
  * @throws {Error} when there is some error while deleting the database
  */
 function deleteDatabase(Database) {
-
   // Delete the database folder
   fs.rmdir(Database, { recursive: true }, (err) => {
     if (err) {
@@ -76,18 +75,17 @@ function deleteDatabase(Database) {
  * @param {String} Table_Name the name of the table you want to create
  * @throws {Error} if there is some error while creating the table
  */
-function createTable(Database,Table_Name){
+function createTable(Database, Table_Name) {
+  // create a path where the table has to be created
+  const filePath = path.join(Database, Table_Name);
 
-    // create a path where the table has to be created
-    const filePath = path.join(Database,Table_Name)
-
-    fs.writeFile(filePath, '', 'utf8', (err) => {
-        if (err) {
-          console.error(`Error creating table '${filePath}':`, err);
-        } else {
-          console.log(`Table '${filePath}' created successfully!`);
-        }
-      })
+  fs.writeFile(filePath, "", "utf8", (err) => {
+    if (err) {
+      console.error(`Error creating table '${filePath}':`, err);
+    } else {
+      console.log(`Table '${filePath}' created successfully!`);
+    }
+  });
 }
 
 /**Function to read the table
@@ -96,20 +94,17 @@ function createTable(Database,Table_Name){
  * @throws {Error} when there is some issue while reading the table
  */
 function readTable(Database, Table_Name) {
-        
-    // Construct the full path to the file
-    const filePath = path.join(Database, Table_Name);
-  
-    // Read the content of the file
-    fs.readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-        console.error(`Error reading file '${filePath}':`, err);
-        
-      } else {
-        console.log(`File '${filePath}' read successfully!`,data);
-      
-      }
-    });
+  // Construct the full path to the file
+  const filePath = path.join(Database, Table_Name);
+
+  // Read the content of the file
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      console.error(`Error reading file '${filePath}':`, err);
+    } else {
+      console.log(`File '${filePath}' read successfully!`, data);
+    }
+  });
 }
 
 /**Function to update the table
@@ -119,12 +114,11 @@ function readTable(Database, Table_Name) {
  * @throws {Error} when there is some error while updating the record
  */
 function updateTable(Database, Table_Name, newRecord) {
-
   // Construct the full path to the file
   const filePath = path.join(Database, Table_Name);
 
   // Read the existing content of the file
-  fs.readFile(filePath, 'utf8', (err, existingRecord) => {
+  fs.readFile(filePath, "utf8", (err, existingRecord) => {
     if (err) {
       console.error(`Error reading file '${filePath}' for update:`, err);
     } else {
@@ -147,7 +141,7 @@ function updateTable(Database, Table_Name, newRecord) {
         const updatedData = JSON.stringify(existingData, null, 2);
 
         // Write the updated data to the file
-        fs.writeFile(filePath, updatedData, 'utf8', (writeErr) => {
+        fs.writeFile(filePath, updatedData, "utf8", (writeErr) => {
           if (writeErr) {
             console.error(`Error updating file '${filePath}':`, writeErr);
           } else {
@@ -168,7 +162,6 @@ function updateTable(Database, Table_Name, newRecord) {
  * @throws {Error} when there is some error while deleting the table
  */
 function deleteTable(Database, Table_Name) {
-
   // Construct the full path to the file
   const filePath = path.join(Database, Table_Name);
 
@@ -188,23 +181,20 @@ function deleteTable(Database, Table_Name) {
  * @param {Object} record the record that you want to put in the table
  */
 function createRecord(Database, Table_Name, record) {
-  
-    // Construct the full path to the file
-    const filePath = path.join(Database, Table_Name);
-  
-    // Convert JSON objects to a JSON string
-    const jsonString = JSON.stringify(record, null, 2); // The third parameter (2) is for indentation
-  
-    // Write the JSON string to the file
-    fs.writeFile(filePath, jsonString, 'utf8', (err) => {
-      if (err) {
-        console.error(`Error writing record to table '${filePath}':`, err);
-        
-      } else {
-        console.log(`record written to table '${filePath}' successfully!`);
-        
-      }
-    });
+  // Construct the full path to the file
+  const filePath = path.join(Database, Table_Name);
+
+  // Convert JSON objects to a JSON string
+  const jsonString = JSON.stringify(record, null, 2); // The third parameter (2) is for indentation
+
+  // Write the JSON string to the file
+  fs.writeFile(filePath, jsonString, "utf8", (err) => {
+    if (err) {
+      console.error(`Error writing record to table '${filePath}':`, err);
+    } else {
+      console.log(`record written to table '${filePath}' successfully!`);
+    }
+  });
 }
 
 /**Function to update the records
@@ -214,14 +204,14 @@ function createRecord(Database, Table_Name, record) {
  * @param {Object} newData the new record to put
  * @throws {Error} when there is some error while creating the record
  */
-function updateRecord(Database,Table_Name,targetId,newData){
+function updateRecord(Database, Table_Name, targetId, newData) {
   // Construct the full path to the file
   const filePath = path.join(Database, Table_Name);
 
   // Read existing data from the file
-  const existingData = fs.readFileSync(filePath, 'utf8');
+  const existingData = fs.readFileSync(filePath, "utf8");
   let dataArray = [];
-  
+
   try {
     // Try parsing existing data as JSON
     dataArray = JSON.parse(existingData);
@@ -232,20 +222,23 @@ function updateRecord(Database,Table_Name,targetId,newData){
       dataArray = [dataArray];
     }
 
-  // Find the index of the target data based on some identifier (e.g., id)
-  const targetIndex = dataArray.findIndex(item => item.id === targetId);
+    // Find the index of the target data based on some identifier (e.g., id)
+    const targetIndex = dataArray.findIndex((item) => item.id === targetId);
 
-
-  // If the target data is found, update it
-  if (targetIndex !== -1) {
-    dataArray[targetIndex] = { ...dataArray[targetIndex], ...newData };
-    // Write the updated data back to the file
-    fs.writeFileSync(filePath, JSON.stringify(dataArray, null, 2), 'utf8');
-    console.log(`Data with id '${targetId}' has been updated in the '${Table_Name}' table in the '${Database}' database.`);
+    // If the target data is found, update it
+    if (targetIndex !== -1) {
+      dataArray[targetIndex] = { ...dataArray[targetIndex], ...newData };
+      // Write the updated data back to the file
+      fs.writeFileSync(filePath, JSON.stringify(dataArray, null, 2), "utf8");
+      console.log(
+        `Data with id '${targetId}' has been updated in the '${Table_Name}' table in the '${Database}' database.`
+      );
     } else {
-      console.log(`Data with id '${targetId}' not found in the '${Table_Name}' table in the '${Database}' database.`);
+      console.log(
+        `Data with id '${targetId}' not found in the '${Table_Name}' table in the '${Database}' database.`
+      );
     }
-  }catch (parseError) {
+  } catch (parseError) {
     // If parsing fails, log an error
     console.error(`Error parsing JSON in file '${filePath}':`, parseError);
   }
@@ -253,7 +246,7 @@ function updateRecord(Database,Table_Name,targetId,newData){
 
 /**This is a function to delete records from a table
  * @param {String} Database the database where the table exists
- * @param {String} Table_Name the name of the table 
+ * @param {String} Table_Name the name of the table
  * @param {Number} targetId the id of the record you want to delete
  * @throws {Error} when there is some error while deleting the record
  */
@@ -262,7 +255,7 @@ function deleteRecord(Database, Table_Name, targetId) {
   const filePath = path.join(Database, Table_Name);
 
   // Read existing data from the file
-  const existingData = fs.readFileSync(filePath, 'utf8');
+  const existingData = fs.readFileSync(filePath, "utf8");
   let dataArray = [];
 
   try {
@@ -276,50 +269,56 @@ function deleteRecord(Database, Table_Name, targetId) {
     }
 
     // Filter out the record to delete
-    const updatedData = dataArray.filter(item => item.id !== targetId);
+    const updatedData = dataArray.filter((item) => item.id !== targetId);
 
     // Convert the updated array to JSON string
     const updatedDataString = JSON.stringify(updatedData, null, 2);
 
     // Write the updated data back to the file
-    fs.writeFileSync(filePath, updatedDataString, 'utf8');
-    console.log(`Record with id '${targetId}' deleted from the '${Table_Name}' table in the '${Database}' database.`);
+    fs.writeFileSync(filePath, updatedDataString, "utf8");
+    console.log(
+      `Record with id '${targetId}' deleted from the '${Table_Name}' table in the '${Database}' database.`
+    );
   } catch (parseError) {
     // If parsing fails, log an error
     console.error(`Error parsing JSON in file '${filePath}':`, parseError);
   }
 }
 
+function testing() {
+  // createDB('aspire');
 
-function testing(){
-    // createDB('aspire');
-    // createTable('aspire', 'students.json')
+  // createTable('aspire', 'students.json')
 
-    // creating a record in json format
-    // const record = {
-    //     id: 1,
-    //     key1: 'vivek',
-    //     key2: 'kale',
-    //     key3: [1, 2,3],
-    //   };
-    // createRecord('aspire','employee.json',record)
-    // readTable('innovapptive','employee.json')
-    // readDatabase('innovapptive')
-    // updateDB('innovapptive','lol')
-    // const new_record = {
-    //   key1: 'value69',
-    //   key2: 'value96',
-    //   key3: [4,5,6],
-    // };
-    // newRecord = {key1: 'name'}
-    // updateRecord('aspire','employee.json',1,newRecord)
-    // const recordToDelete = {
-    //   key1: "value69",
-    //   key2: "value96",
-    //   key3: [4,5,6]
-    // };
-    
-    // deleteRecord('innovapptive', 'employee.json', 1);
+  // creating a record in json format
+  // const record = {
+  //     id: 1,
+  //     key1: 'vivek',
+  //     key2: 'kale',
+  //     key3: [1, 2,3],
+  //   };
+  // createRecord('aspire','employee.json',record)
+
+  // readTable('innovapptive','employee.json')
+
+  // readDatabase('innovapptive')
+
+  // updateDB('innovapptive','lol')
+
+  // const new_record = {
+  //   key1: 'value69',
+  //   key2: 'value96',
+  //   key3: [4,5,6],
+  // };
+  // newRecord = {key1: 'name'}
+  // updateRecord('aspire','employee.json',1,newRecord)
+	
+  // const recordToDelete = {
+  //   key1: "value69",
+  //   key2: "value96",
+  //   key3: [4,5,6]
+  // };
+  // deleteRecord('innovapptive', 'employee.json', 1);
 }
 
-testing()
+testing();
