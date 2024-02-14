@@ -197,6 +197,50 @@ function createRecord(Database, Table_Name, record) {
   });
 }
 
+/**Function to read the record
+ * @param {String} Database the database that you want to read
+ * @param {String} Table_Name the table that you want to read
+ * @param {Number} targetId the id of record that you want to read
+ * @throws {Error} when there is some error while reading the record
+ */
+function readRecord(Database, Table_Name, targetId) {
+  // Construct the full path to the file
+  const filePath = path.join(Database, Table_Name);
+
+  // Read existing data from the file
+  const existingData = fs.readFileSync(filePath, "utf8");
+  let dataArray = [];
+
+  try {
+    // Try parsing existing data as JSON
+    dataArray = JSON.parse(existingData);
+
+    // Check if existingData is an array
+    if (!Array.isArray(dataArray)) {
+      // If not an array, create an array with the existing data
+      dataArray = [dataArray];
+    }
+
+    // Find the record with the target ID
+    const targetRecord = dataArray.find((item) => item.id === targetId);
+
+    // If the target record is found, log it
+    if (targetRecord) {
+      console.log(
+        `Record with id '${targetId}' found in the '${Table_Name}' table in the '${Database}' database:`,
+        targetRecord
+      );
+    } else {
+      console.log(
+        `Record with id '${targetId}' not found in the '${Table_Name}' table in the '${Database}' database.`
+      );
+    }
+  } catch (parseError) {
+    // If parsing fails, log an error
+    console.error(`Error parsing JSON in file '${filePath}':`, parseError);
+  }
+}
+
 /**Function to update the records
  * @param {String} Database the database that you want to update
  * @param {String} Table_Name the table that you want to update
@@ -275,7 +319,13 @@ function deleteRecord(Database, Table_Name, targetId) {
     const updatedDataString = JSON.stringify(updatedData, null, 2);
 
     // Write the updated data back to the file
-    fs.writeFileSync(filePath, updatedDataString, "utf8");
+    fs.writeFile(filePath, updatedDataString, "utf8",(err) => {
+      if (err) {
+        console.error(`Error creating table '${filePath}':`, err);
+      } else {
+        console.log(`Table '${filePath}' created successfully!`);
+      }
+    });
     console.log(
       `Record with id '${targetId}' deleted from the '${Table_Name}' table in the '${Database}' database.`
     );
@@ -285,40 +335,32 @@ function deleteRecord(Database, Table_Name, targetId) {
   }
 }
 
+// this is a function to call all the functions
 function testing() {
-  // createDB('aspire');
+  // createDB('new');
 
-  // createTable('aspire', 'students.json')
+  // createTable('new', 'latest.json')
 
-  // creating a record in json format
+  // // creating a record in json format
   // const record = {
   //     id: 1,
   //     key1: 'vivek',
   //     key2: 'kale',
   //     key3: [1, 2,3],
   //   };
-  // createRecord('aspire','employee.json',record)
+  // createRecord('new','latest.json',record)
 
-  // readTable('innovapptive','employee.json')
+  // readDatabase('new')
 
-  // readDatabase('innovapptive')
+  // readTable('new','latest.json')
 
   // updateDB('innovapptive','lol')
 
-  // const new_record = {
-  //   key1: 'value69',
-  //   key2: 'value96',
-  //   key3: [4,5,6],
-  // };
-  // newRecord = {key1: 'name'}
+  // let newRecord = {key1: 'name'}
   // updateRecord('aspire','employee.json',1,newRecord)
 	
-  // const recordToDelete = {
-  //   key1: "value69",
-  //   key2: "value96",
-  //   key3: [4,5,6]
-  // };
   // deleteRecord('innovapptive', 'employee.json', 1);
+  readRecord('new','latest.json',1)
 }
 
 testing();
