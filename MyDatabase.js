@@ -65,7 +65,7 @@ function deleteDatabase(Database) {
     if (err) {
       console.error(`Error deleting database '${DBstring}':`, err);
     } else {
-      console.log(`Database '${DBstring}' deleted successfully!`);
+      console.log(`Database deleted successfully!`);
     }
   });
 }
@@ -107,55 +107,6 @@ function readTable(Database, Table_Name) {
   });
 }
 
-/**Function to update the table
- * @param {String} Database the database that has your folder
- * @param {String} Table_Name the table that you want to update
- * @param {Object} newRecord the new record that you want to add
- * @throws {Error} when there is some error while updating the record
- */
-function updateTable(Database, Table_Name, newRecord) {
-  // Construct the full path to the file
-  const filePath = path.join(Database, Table_Name);
-
-  // Read the existing content of the file
-  fs.readFile(filePath, "utf8", (err, existingRecord) => {
-    if (err) {
-      console.error(`Error reading file '${filePath}' for update:`, err);
-    } else {
-      let existingData;
-
-      try {
-        // Try parsing existing data as JSON
-        existingData = JSON.parse(existingRecord);
-
-        // Check if existingData is an array
-        if (!Array.isArray(existingData)) {
-          // If not an array, create an array with the existing data
-          existingData = [existingData];
-        }
-
-        // Add the new record to the array
-        existingData.push(newRecord);
-
-        // Convert the updated array to JSON string
-        const updatedData = JSON.stringify(existingData, null, 2);
-
-        // Write the updated data to the file
-        fs.writeFile(filePath, updatedData, "utf8", (writeErr) => {
-          if (writeErr) {
-            console.error(`Error updating file '${filePath}':`, writeErr);
-          } else {
-            console.log(`File '${filePath}' updated successfully!`);
-          }
-        });
-      } catch (parseError) {
-        // If parsing fails, assume existingData is not an array
-        console.error(`Error parsing JSON in file '${filePath}':`, parseError);
-      }
-    }
-  });
-}
-
 /**This is a function to delete a table from a database
  * @param {String} Database the database where the table exists
  * @param {String} Table_Name the name of the table you want to delete
@@ -184,15 +135,41 @@ function createRecord(Database, Table_Name, record) {
   // Construct the full path to the file
   const filePath = path.join(Database, Table_Name);
 
-  // Convert JSON objects to a JSON string
-  const jsonString = JSON.stringify(record, null, 2); // The third parameter (2) is for indentation
-
-  // Write the JSON string to the file
-  fs.writeFile(filePath, jsonString, "utf8", (err) => {
+  // Read the existing content of the file
+  fs.readFile(filePath, "utf8", (err, existingRecord) => {
     if (err) {
-      console.error(`Error writing record to table '${filePath}':`, err);
+      console.error(`Error reading file '${filePath}' for update:`, err);
     } else {
-      console.log(`record written to table '${filePath}' successfully!`);
+      let existingData;
+
+      try {
+        // Try parsing existing data as JSON
+        existingData = JSON.parse(existingRecord);
+
+        // Check if existingData is an array
+        if (!Array.isArray(existingData)) {
+          // If not an array, create an array with the existing data
+          existingData = [existingData];
+        }
+      } catch (parseError) {
+        // If parsing fails or the file is empty, assume existingData is not an array
+        existingData = [];
+      }
+
+      // Add the new record to the array
+      existingData.push(record);
+
+      // Convert the updated array to JSON string
+      const updatedData = JSON.stringify(existingData, null, 2);
+
+      // Write the updated data to the file
+      fs.writeFile(filePath, updatedData, "utf8", (writeErr) => {
+        if (writeErr) {
+          console.error(`Error updating file '${filePath}':`, writeErr);
+        } else {
+          console.log(`File '${filePath}' updated successfully!`);
+        }
+      });
     }
   });
 }
@@ -321,14 +298,11 @@ function deleteRecord(Database, Table_Name, targetId) {
     // Write the updated data back to the file
     fs.writeFile(filePath, updatedDataString, "utf8",(err) => {
       if (err) {
-        console.error(`Error creating table '${filePath}':`, err);
+        console.error(`Error deleting record '${filePath}':`, err);
       } else {
-        console.log(`Table '${filePath}' created successfully!`);
+        console.log(`Record with id '${targetId}' deleted from the '${Table_Name}' table in the '${Database}' database.`);
       }
     });
-    console.log(
-      `Record with id '${targetId}' deleted from the '${Table_Name}' table in the '${Database}' database.`
-    );
   } catch (parseError) {
     // If parsing fails, log an error
     console.error(`Error parsing JSON in file '${filePath}':`, parseError);
@@ -337,30 +311,38 @@ function deleteRecord(Database, Table_Name, targetId) {
 
 // this is a function to call all the functions
 function testing() {
-  // createDB('new');
+  // createDB('vivek');
 
-  // createTable('new', 'latest.json')
+  // createTable('vivek', 'student.json')
 
   // // creating a record in json format
   // const record = {
   //     id: 1,
-  //     key1: 'vivek',
-  //     key2: 'kale',
-  //     key3: [1, 2,3],
+  //     key1: 'hello',
+  //     key2: 'vivek',
+  //     key3: [1, 2,3]
   //   };
-  // createRecord('new','latest.json',record)
+  // createRecord('vivek','student.json',record)
 
-  // readDatabase('new')
+  // readDatabase('vivek')
 
-  // readTable('new','latest.json')
+  // readTable('vivek','student.json')
 
   // updateDB('innovapptive','lol')
 
-  // let newRecord = {key1: 'name'}
-  // updateRecord('aspire','employee.json',1,newRecord)
+  // let newRecord = {key1: 'hi'}
+  // updateRecord('vivek','student.json',1,newRecord)
 	
-  // deleteRecord('innovapptive', 'employee.json', 1);
-  readRecord('new','latest.json',1)
+  // deleteRecord('vivek', 'student.json', 1);
+
+  // readRecord('new','latest.json',1)
+
+  // deleteTable('vivek','student.json')
+
+  deleteDatabase('vivek')
+
+  
+  
 }
 
 testing();
